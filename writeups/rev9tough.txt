@@ -1,0 +1,127 @@
+Reverse Engineering 9
+Tough - 1237 pts
+
+You would have to drop this one a few times before it breaks. (all ASCII chars)
+
+Dev: Sri
+
+File: tough.java
+
+
+
+Solution:
+
+In this Java program, the main method takes user input and strips the rtcp{} format, passing the string into the check function.
+
+In the check function, we see that the input string must be 24 characters long or else the function will return false. We also see that the createMap function is called 4 times.
+
+Taking a step back, we see that this program has several static variables. At the top, we see 2 integer arrays, realflag and therealflag, each holding 24 numbers ranging from 0 to 23. Next, we see 4 hashmaps. And finally, there are 2 booleans m and g, true and false respectively.
+
+Taking a look at the createMap function, we see that it takes in three parameters. The first parameter is a hashmap where we will enter key-value pairs later. The second parameter is a string and the third/last parameter is a boolean. We see that the function goes through the string, adding each character into the hashmap. The key for each character is determined by the value in realflag or therealflag. If the boolean is true, then the key is taken from realflag. If the boolean is false, then the key is taken from therealflag.
+
+Going back to the check function, we see that the createMap function is called 4 times. The first time it is called, we see that theflags is passed in along with the input string and m (true). This means the characters in the input string are put into theflags with keys from realflag. The second time it is called, we see that theflags0 is passed in along with the given flag string and g (false). This means that the characters in theflag string are put into theflags0 with keys from therealflag. The third time it is called, we see that theflags1 is passed in along with the input string and g (false). This means that the characters in the input string are put into theflags1 with keys from therealflag. The fourth and final time it is called, we see that theflags2 is passed in along with the given flag string and m (true). This means the characters in theflag string are put into theflags2 with keys from real flag.
+
+After the hashmaps are created, the program is now creating theflag. The first for loop goes through each key from 0 to 20 and appends the corresponding value in theflags. The second for loop goes through each key from 21 to 23 and appends the corresponding value in theflags1.
+
+After theflag string is made, the program is now creating thefinalflag. The for loop goes through the entire 24 and appends the sum of the ascii value of the corresponding value in theflags0 with the ascii value of the corresponding character at the same index in theflag.
+
+The final for loop goes through thefinalflag and if the ascii value is within the range of 146 to 156, then the ascii value is incremented by 10. Finally, this string is compared with the encoded string.
+
+And like all the other challenges, all of these processes can be reversed and we can write code to reverse it.
+
+Code: tough_solve.java
+
+import java.util.*;
+
+public class tough_solve {
+    public static int[] realflag = {9,4,23,8,17,1,18,0,13,7,2,20,16,10,22,12,19,6,15,21,3,14,5,11};
+    public static int[] therealflag = {20,16,12,9,6,15,21,3,18,0,13,7,1,4,23,8,17,2,10,22,19,11,14,5};
+    public static HashMap<Integer, Character> theflags = new HashMap<>();
+    public static HashMap<Integer, Character> theflags0 = new HashMap<>();
+    public static HashMap<Integer, Character> theflags1 = new HashMap<>();
+    public static HashMap<Integer, Character> theflags2 = new HashMap<>();
+    public static boolean m = true;
+    public static boolean g = false;
+
+    public static void main(String args[]) {
+        int[] unicode = {157, 157, 236, 168, 160, 162, 171, 162, 165, 199, 169, 169, 160, 194, 235, 207, 227, 210, 157, 203, 227, 104, 212, 202};
+
+        String thefinalflag = "";
+        for (int i = 0; i < 24; i++) {
+            if (unicode[i] > 155 && unicode[i] < 167 /* && (i != 5 && i != 8) */ ) {
+                thefinalflag += (char)(unicode[i]-10);
+            } else {
+                thefinalflag += (char)(unicode[i]);
+            }
+        }
+
+        String flag = "ow0_wh4t_4_h4ckr_y0u_4r3";
+        createMap(theflags0, flag, g);
+        createMap(theflags2, flag, m);
+
+        String theflag = "";
+        for (int i = thefinalflag.length()-1; i >= 0; i--) {
+            theflag = (char)(((int)thefinalflag.charAt(i))-((int)theflags0.get(i))) + theflag;
+        }
+
+        for (int i = theflag.length()-1; i >= theflag.length()-3; i--) {
+            theflags1.put(i, theflag.charAt(i));
+        }
+
+        for (int i = theflag.length()-4; i >= 0; i--) {
+            theflags.put(i, theflag.charAt(i));
+        }
+
+        char[] answer= new char[24];
+        for (int i = 0; i < 24; i++) {
+            answer[i] = '?';
+        }
+
+        for (int i = 0; i < 24; i++) {
+            if (realflag[i] < 21) {
+                answer[i] = theflags.get(realflag[i]);
+            }
+        }
+
+        for (int i = 0; i < 24; i++) {
+            if (therealflag[i] > 20) {
+                answer[i] = theflags1.get(therealflag[i]);
+            }
+        }
+
+        System.out.println(new String(answer));
+    }
+
+    public static void createMap(HashMap owo, String input, boolean uwu){
+        if(uwu){
+            for(int i = 0; i < input.length(); i++){
+                owo.put(realflag[i],input.charAt(i));
+            }
+        } else{
+            for(int i = 0; i < input.length(); i++){
+                owo.put(therealflag[i],input.charAt(i));
+            }
+        }
+    }
+}
+
+
+Do to problems with the string, we have been supplied the unicode values for each of the 24 characters in the encoded string. The original program incremented the characters by 10 if they were between 146 to 156 so if we find a character between 156 and 166, we can decrement it by 10. However, this is not always true as some characters could truly be between 156 and 166 and we're not incremented. We can account for this case at the end.
+
+Next, we can reuse the static variables as well as the createMap function and theflag to create the hashmaps, theflags0 and theflags2. Similar to the previous challenges, we can reverse the ascii value addition by using subtraction. We get the ascii value of the character in flags0 at position i and subtract it from the ascii value of the character at position i from thefinalflag. Then we append this new character to the front of the string, theflag.
+
+Next, we can reverse the hashmap get method by putting the corresponding key-value pair into the hashmap. After we do that for both for loops, we have all the hashmaps set up.
+
+Now, we can reverse the createMap function. We create a character array called answer to store the correct password. Using the hashmaps, we can recreate the password by going through real flag and the real flag and mapping the correct characters to the correct locations.
+
+After running this, we get the following string: h3?)s_4_c0stly_fl4g_4yeu
+
+This does not look correct as there is a parentheses in the string as well as a misspelling in the word you. Recall that previously, we assumed that every character between 156 and 166 were decremented. We can experiment and realize that the values at 5 and 8 in the original unicode array are between the range but should not be decremented as they shift the characters incorrectly. (Uncomment the code when running to get the correct flag).
+
+After running this, we get the following string: h3?3s_4_c0stly_fl4g_4you
+
+As demonstrated by the question mark, there is a character that is ambiguous as the original program does not use that characters in generating theflag. Looking back at the original program, theflag string only uses the characters from 6, 14, and 19 positions to make theflags1 and it uses 1, 3 - 13, 15 - 18, and 20-23 to make theflags. Therefore, the 2nd character in the input password can be any character and the password is still valid.
+
+However, we can not just submit an answer with random letters in the ambiguous position because the ctf system is looking for a specific solution. From the context clues and some guessing, we see that theflag looks similar to the phrase here's a costly flag for you.
+
+Flag: rtcp{h3r3s_4_c0stly_fl4g_4you}

@@ -1,0 +1,95 @@
+Reverse Engineering 3
+Bendy - 1741 pts
+
+I see you've found my straw collection...(this is the last excessive for loop one i swear)
+
+Dev: Sri
+
+File: bendy.java
+
+
+
+Solution:
+
+In this Java program, the main method takes user input and strips the rtcp{} format, passing the string as a parameter into the check function.
+
+In the check function, we see that the input string must be 21 characters long or else the function will return false. We also see that the string called the flag is created through 3 for loops.
+
+The first for loop takes the ascii value of the ith character of flag and adds the ascii value of the (i+8)th character of the input string.
+
+The second for loop takes the ascii value of the ith character of flag and adds the ascii value of the (i-8)th character of the input string.
+
+The third for loop takes the ascii value of the (i-3)rd character of flag and adds the ascii value of the ith character of the input string.
+
+After this, the flag is split by characters into a string array called flags. Then, the characters in the first half of the array have their ascii values incremented by 20.
+
+Now, the flag is set to the substring of the second half of itself. The incremented characters in the first half of the flags array is now appended to the flag. In the end, the flag is compared to the given encoded string.
+
+All of these steps in the program are reversible and we can write code to do it.
+
+Code: bendy_solve.java
+
+import java.util.*;
+
+public class bendy_solve {
+    public static void main(String args[]) {
+        String fl = "ÄÑÓ¿ÂÒêáøz§è§ñy÷¦";
+        String theflag = "";
+
+        int current = fl.length()-1;
+
+        char[] flags = new char[fl.length()/2];
+        for (int i = fl.length()/2-1; i >= 0; i--) {
+            flags[i] = fl.charAt(current);
+            current--;
+        }
+
+        for (int i = fl.length()/2-1; i >= 0; i--) {
+            flags[i] = (char)((int)flags[i]-20);
+        }
+
+        theflag += String.valueOf(flags);
+        theflag += fl.substring(0, fl.length()/2);
+
+        String flag = "r34l_g4m3rs_eXclus1v3";
+
+        char[] arr = new char[flag.length()];
+
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = '?';
+        }
+
+        current = theflag.length()-1;
+        for (int i = flag.length()-1; i >= flag.length()-6; i--) {
+            arr[i] = (char)((int)theflag.charAt(current)-(int)flag.charAt(i-3));
+            current--;
+        }
+
+        for (int i = flag.length()-7; i>= 10; i--) {
+            arr[i-8] = (char)((int)theflag.charAt(current)-(int)flag.charAt(i));
+            current--;
+        }
+
+        for (int i = flag.length()-15; i>= 0; i--) {
+            arr[i+8] = (char)((int)theflag.charAt(current)-(int)flag.charAt(i));
+            current--;
+        }
+
+        System.out.println(new String(arr));
+    }
+}
+
+
+We can create a string called fl which is the given encoded string. We can create an array called flags similar to hold the same characters as it does in the original program. In the original program, it appended the values in the array to the end of theflag.
+
+We can reverse this by taking the characters from the end of fl and adding them to the array. Next, we decrement each character in the array by 20. Now that we have all the correct characters, we can recreate theflag by adding the first half, the characters in the array, and then adding the second half, a substring of the first half of fl.
+
+Now that we have theflag, we can do something similar to the last challenge. We create a character array to store the correct password and then we reverse the three for loops.
+
+Again, we can use subtraction of the ascii values to get the character at the specific location, taking into consideration the offsets. After running the program, we get the following string: ??p3_y0?r3_h4v1ng_fun
+
+As demonstrated by the three question marks, those characters are ambiguous as the original program does not use those characters in generating theflag. Looking back at the original program, theflag string only uses the characters from 8 - 14, 2 - 6, and 15 - 21 positions. Therefore, the 0th, 1st, and 7th characters in the input password can be any character and the password is still valid.
+
+However, we can not just submit an answer with random letters in the ambiguous positions because the ctf system is looking for a specific solution. From the context clues and some guessing, we see that the password string looks similar to the phrase hope you're having fun.
+
+Flag: rtcp{h0p3_y0ur3_h4v1ng_fun}

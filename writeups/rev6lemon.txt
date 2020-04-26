@@ -1,0 +1,18 @@
+Reverse Engineering 6
+Lemon - 50 pts
+
+Fine. I made it a bit more secure by not just leaving it directly in the code.
+
+Dev: William
+
+File: pass2.py
+
+
+
+Solution:
+
+In this python program, the main method calls the checkpass function. Similar to the previous challenge, when checkpass returns true, we have unlocked the password.
+
+Taking a look at the checkpass function, we see that the program is taking user input and returning whether it matches a given string. While the previous challenge compared the input string directly with the given string, this challenge is comparing the substrings of the input string with the substrings of the given string. We can append all the substrings together to form the flag.
+
+Flag: rtcp{y34H_tHiS_a1nT_sEcuR3}

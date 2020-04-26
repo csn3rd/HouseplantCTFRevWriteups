@@ -1,0 +1,48 @@
+Reverse Engineering 7
+Squeezy - 50 pts
+
+Ok this time, you aren't getting anywhere near anything.
+
+Dev: William
+
+File: pass3.py
+
+
+
+Solution:
+
+In this python program, the main method calls the checkpass function which returns a boolean. When checkpass returns true, we have unlocked the password.
+
+Taking a look at the checkpass function, we see that the function is taking user input and then passing the given key string along with the user input into the woah function.
+
+Taking a look at the woah function, we see that the function returns the xor of the two parameter strings.
+
+Going back to the checkpass function, we see that the result of woah is stored in a string a, which is then utf-8 encoded and then stored in string b. Then, b is encoded in base64 and checked against the given base64 string.
+
+This process is reversible and we can write code to do that.
+
+Code: squeezy_solve.py
+
+import base64
+def checkpass():
+  key = "meownyameownyameownyameownyameownya"
+  result = b'HxEMBxUAURg6I0QILT4UVRolMQFRHzokRBcmAygNXhkqWBw='
+  result = base64.b64decode(result, altchars=None).decode('utf-8')
+
+  print(woah(key, result))
+
+def main():
+    access = checkpass()
+
+def woah(s1,s2):
+    return ''.join(chr(ord(a) ^ ord(b)) for a,b in zip(s1,s2))
+
+access = False
+main()
+
+
+We can take the given base64 encoded string and set it to a string result. To reverse the code, we need to go backwards from the code we are given. Therefore, we first decode the base64 encoded string and decode it from utf-8. One property of xor is that if you xor a and b to get c, you can xor a and c to get b.
+
+Hence, we use the same key from the original program as well and we can reuse the same woah (xor) function as well. We can xor the key with the decoded base64 string to get the flag.
+
+Flag: rtcp{y0u_L3fT_y0uR_x0r_K3y_bEh1nD!}

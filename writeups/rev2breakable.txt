@@ -1,0 +1,58 @@
+Reverse Engineering 2
+Breakable - 50 pts
+
+Okay...this one's better, but still be careful!
+
+Dev: Sri
+
+File: breakable.java
+
+
+
+Solution:
+
+In the Java program, the main method takes user input and strips the rtcp{} format, passing the string as a parameter into the check function.
+
+In the check function, we see that the input string must be 16 characters long or else the function will return false. We also see that the string called the flag is created through 2 for loops.
+
+The first for loop takes the ascii value of the ith character of flag and adds the ascii value of the (i+2)nd character of the input string.
+
+The second for loop takes the ascii values of the ith character of flag and adds the ascii value of the (i-2)nd character of the input string.
+
+After this, the next 4 lines do not do anything, so we can ignore it. In the end, the flag is compared to the given encoded string.
+
+Now that we understand the check function, we can easily reverse this.
+
+Code: breakable_solve.java
+
+import java.util.*;
+
+public class breakable_solve {
+    public static void main(String args[]) {
+        String fl = "ÒdÝ¾¤¤¾ÙàåÐcÝÆ¥ÌÈáÏÜ¦aã";
+        String flag = "k33p_1t_in_pl41n";
+
+        char[] arr = new char[flag.length()];
+
+        int current = fl.length()-1;
+        for (int i = flag.length()-1; i >= 2; i--) {
+            arr[i-2] = (char)((int)fl.charAt(current)-(int)flag.charAt(i));
+            current--;
+        }
+
+        for (int i = flag.length()-3; i >= 0; i--) {
+            arr[i+2] = (char)((int)fl.charAt(current)-(int)flag.charAt(i));
+            current--;
+        }
+        System.out.println(new String(arr));
+    }
+}
+
+
+We can create a string called fl which is the given encoded string. The string called flag remains the same. Next, we can create a character array to store the correct password.
+
+Then, we reverse the two for loops, going in reverse order. Similar to the first reverse engineering challenge, we can use subtraction of the ascii values to calculate the character at the current position. The difference in this problem, however, is that there is an offset of -2 for the first loop and an offset of +2 for the second loop.
+
+After running the code, we get the string: "0mg_1m_s0_pr0ud_"
+
+Flag: rtcp{0mg_1m_s0_pr0ud_}

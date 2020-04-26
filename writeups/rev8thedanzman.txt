@@ -1,0 +1,66 @@
+Reverse Engineering 8
+thedanzman - 50 pts
+
+Fine. I made it even harder. It is now no longer "ez", "pz", "lemon" or "squeezy".
+You will never get the flag this time.
+
+Dev: William
+
+File: pass4.py
+
+
+
+Solution:
+
+In this python program, the main method calls the checkpass funciton which returns a boolean. When checkpass returns true, we have unlocked the password.
+
+Taking a look at the checkpass function, we see that the function is taking user input. The given key is passed into a rot-13 encoding function. Then, the input string and the key are passed into the nope function.
+
+Taking a look at the nope function, just like the previous challenge, we see that the function returns the xor of the two parameter strings.
+
+Going back to the checkpass function, we see that the result of the nope function is stored in a string a, which is then utf-8 encoded and then stored in string b. Then, b is encoded in base64 and this bytestring is stored in c. c is then passed into a rot-13 encoding function and stored in d. Then, d is passed into th wow function.
+
+Taking a look at the wow function, we see that it takes in a string and then returns the reverse.
+
+Going back to the checkpass function, we see that d is reversed and then stored in result. Result is then compared to the given encoded string.
+
+This process is reversible and we can write code to do that.
+
+Code: thedanzman_solve.py
+
+import base64
+import codecs
+def checkpass():
+  key = "nyameowpurrpurrnyanyapurrpurrnyanya"
+  key = codecs.encode(key, "rot_13")
+  result = "'=ZkXipjPiLIXRpIYTpQHpjSQkxIIFbQCK1FR3DuJZxtPAtkR'o"
+  result = (codecs.decode(result, 'rot_13'))
+  result = wow(result)
+  result = result[2:len(result)-1:1]
+
+  result = base64.b64decode(result, altchars=None).decode('utf-8')
+
+  ans = nope(key, result)
+  print(ans)
+
+def main():
+    access = checkpass()
+
+def nope(s1,s2):
+    return ''.join(chr(ord(a) ^ ord(b)) for a,b in zip(s1,s2))
+
+def wow(x):
+  return x[::-1]
+
+
+access = False
+main()
+
+
+We can reuse the wow function and use it to reverse the given result string. Then, we can decode result by passing it through the rot-13 decoding function. Then, we can encode it into the byte string to pass into the base64 decode function. We take the decoded base64 string and decode it from utf-8.
+
+Reminder, a property of xor is that if you xor a and b to get c, you can xor a and c to get b.
+
+So we can reuse the nope function for the xor. We can reuse the code for the key from the original program. We can xor the encoded key and the decoded base64 string to get the flag.
+
+Flag: rtcp{n0w_tH4T_w45_m0r3_cH4lL3NgiNG}

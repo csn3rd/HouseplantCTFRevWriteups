@@ -1,0 +1,41 @@
+Reverse Engineering 1
+Fragile - 50 pts
+
+Can you help me move my stuff? This one's fragile!
+
+Dev: Sri
+
+File: fragile.java
+
+
+
+Solution:
+
+In this Java program, the main method takes user input and strips the rtcp{} format, passing the string as a parameter into the check function.
+
+In the check function, we see that the input string must be 15 characters long or else the function will return false. We also see that a string called theflag is created by adding the ascii values of flag and input at each position. At the end, it compares the string to their encoded string.
+
+Now that we understand the check function, we can reverse this easily by subtracting the corresponding ascii values.
+
+Code: fragile_solve.java
+
+import java.util.*;
+
+public class fragile_solve {
+    public static void main(String args[]) {
+    	String a = "ÐdØÓ§åÍaèÒÁ¡";
+    	String b = "h1_th3r3_1ts_m3";
+    	String c = "";
+        for (int i = 0; i < 15; i++) {
+        	c += (char)((int)a.charAt(i)-(int)b.charAt(i));
+        }
+        System.out.println((c));
+    }
+}
+
+
+We can create a string a which will be the encoded string we are given. We can crate a string b which will be the flag string we are given. Then, we create a string c by going through each position, subtracting the ascii value of the character in b at the position from the ascii value of the character in a at the position. We then take this ascii value and convert it to the corresponding character and add it to c.
+
+After running the code, we get the string: "h3y_1ts_n0t_b4d"
+
+Flag: rtcp{h3y_1ts_n0t_b4d}

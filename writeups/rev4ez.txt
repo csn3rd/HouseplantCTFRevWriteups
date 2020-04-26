@@ -1,0 +1,18 @@
+Reverse Engineering 4
+EZ - 50 pts
+
+I made a password system, bet you can't get the flag
+
+Dev: William
+
+File: pass0.py
+
+
+
+Solution:
+
+In this Python program, there are a bunch of print statements. Running the program shows that we have been rickrolled.
+
+In the code itself, there is a print statement containing the flag that has been commented out. No work needed for this challenge. We can just copy paste the flag.
+
+Flag: rtcp{tH1s_i5_4_r3aL_fL4g_s0_Do_sUbm1T_1t!}
